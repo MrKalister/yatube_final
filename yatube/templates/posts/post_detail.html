@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %} 
+  Пост {{ post.text|truncatechars:30 }}
+{% endblock %}
+{% block content %} 
+  <div class="row">
+    <aside class="col-12 col-md-3">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          Дата публикации: {{ post.pub_date|date:"d E Y" }}
+        </li>
+        {% if post.group %}   
+          <li class="list-group-item">
+              Группа: {{ post.group }}
+            <br>
+            <a href="{% url 'Posts:group_list' post.group.slug %}">
+              все записи группы
+            </a>
+          </li>
+        {% endif %}
+        {% csrf_token %}
+        <li class="list-group-item">Автор: 
+          <a href="{% url 'Posts:profile' post.author %}">
+            {{ post.author.get_full_name }}
+          </a>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          Всего постов автора:  <span >{{ post.author.posts.count }}</span>
+        </li>
+        <li class="list-group-item">
+          <a href="{% url 'Posts:profile' post.author.username %}">
+            Все посты пользователя
+          </a>
+        </li>
+      </ul>
+    </aside>
+    <article class="col-12 col-md-9">
+      {% include 'posts/includes/thumbnail.html' %}
+      <p>
+        {{ post.text|linebreaks }}
+      </p>
+      {% if post.author == request.user %} 
+      <button type="submit" class="btn btn-primary"> 
+        <a href="{% url 'Posts:post_edit' post.id %}" class="text-white" style="text-decoration: none">
+          Редактировать пост
+        </a>
+      </button>
+      <button type="submit" class="btn btn-danger"> 
+        <a href="{% url 'Posts:post_del' post.id %}" class="text-white" style="text-decoration: none">
+          Удалить пост
+        </a>
+      </button>
+      {% endif %}
+      {% include 'posts/includes/form_comment.html' %}
+    </article>
+  </div> 
+{% endblock %}

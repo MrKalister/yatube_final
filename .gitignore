@@ -150,3 +150,13 @@ static/
 yatube/posts/static/
 yatube/media/
 
+
+# MytestDir
+MYtestdir/
+
+# файлы и папки, создаваемые пакетом Coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover

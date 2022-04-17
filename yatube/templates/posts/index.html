@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+  {% block title %} 
+    {{ title }}
+  {% endblock %}
+
+  {% block content %}
+  {% load cache %}
+  
+    <h1>{{ title }}</h1>
+    {% cache 20 index_page %}
+    <article>
+      {% for post in page_obj %}
+        {% include 'includes/post_card.html' with show_author=True show_group=True %}
+        {% if not forloop.last %}
+          <hr>
+        {% endif %}
+      {% endfor %} 
+    </article>
+    {% endcache %}
+    {% include 'posts/includes/paginator.html' %}
+  {% endblock %}

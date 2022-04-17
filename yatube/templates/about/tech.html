@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+{% comment %} Колонки с отступом сверху и снизу {% endcomment %}
+<div class="row">
+  <h1>Вот что я умею</h1>
+  {% comment %}
+    Боковой блок со списком технологий 
+    Займет всю ширину блока на мобильном
+    и 25% при размерах экрана ≥768px
+  {% endcomment %}
+  <aside class="col-12 col-md-3">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">
+        Python
+      </li>
+      <li class="list-group-item">
+        Django
+      </li>
+      <li class="list-group-item">
+        Git
+      </li>
+      <li class="list-group-item">
+        Bootstrap
+      </li>
+    </ul>
+  </aside>
+  {% comment %}
+    Статья  
+    Займет всю ширину блока на мобильном
+    и 75% при размерах экрана ≥768px
+  {% endcomment %}
+  <article class="col-12 col-md-9">
+    <p>
+      На этой странице можно рассказать,
+      какие программные инструменты вы применили
+      для создания этого сайта, какие навыки вам помогли,
+      с чем вы хорошо разобрались, а с чем — не очень.
+      Картинки и нестандартные подходы приветствуются:
+      эта страница может получиться очень интересной.
+    </p>
+  </article>
+</div>
+{% endblock %}
