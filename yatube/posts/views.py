@@ -43,7 +43,10 @@ def profile(request, username):
     post_list = profile.posts.all()
     following = False
     if request.user.is_authenticated:
-        follower_list = Follow.objects.filter(user=request.user, author=profile)
+        follower_list = Follow.objects.filter(
+            user=request.user,
+            author=profile
+        )
         if follower_list:
             following = True
     context = {
@@ -152,8 +155,8 @@ def profile_follow(request, username):
     if follower_list.exists() or follower == author:
         return redirect('Posts:index')
     Follow.objects.create(
-        author = author,
-        user = follower
+        author=author,
+        user=follower
     )
     return redirect('Posts:profile', username)
 

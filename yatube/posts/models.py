@@ -87,6 +87,7 @@ class Comment(models.Model):
         verbose_name = 'Комментарий'  # Название группы в Админ панели.
         verbose_name_plural = 'Комментарии'
 
+
 class Follow(models.Model):
     user = models.ForeignKey(
         User,
