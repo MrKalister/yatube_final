@@ -2,22 +2,25 @@
 {% block title %} 
     Профайл пользователя {{ profile.get_full_name }}
 {% endblock %}
-{% block content %}      
+{% block content %}
+<div class="mb-5">      
   <h1>
     Все посты пользователя {{ profile.get_full_name }} 
   </h1>
   <h3>
-    Всего постов: {{ profile.posts.count }} <!--тоже от count избавился.Хорошая хитрость-->
-  </h3>   
-    {% for post in page_obj %}
-      <article>
-        {% include 'includes/post_card.html' with show_author=False show_group=True %}
-
-      </article>
-
-      {% if not forloop.last %}
-        <hr>
-      {% endif %}
+    Всего постов: {{ profile.posts.count }}
+  </h3>
+  {% if user.is_authenticated and user != profile %}
+    {% include 'posts/includes/check_following.html' %}
+  {% endif %}
+</div>
+  {% for post in page_obj %}
+    <article>
+      {% include 'includes/post_card.html' with show_author=False show_group=True %}
+    </article>
+    {% if not forloop.last %}
+      <hr>
+    {% endif %}
     {% endfor %}
 {% include 'posts/includes/paginator.html' %}
 {% endblock %}

@@ -86,3 +86,20 @@ class Comment(models.Model):
         ordering = ['-created']
         verbose_name = 'Комментарий'  # Название группы в Админ панели.
         verbose_name_plural = 'Комментарии'
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='follower',
+        verbose_name='Подписчик'
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='following',
+        verbose_name='Автор постов'
+    )
+
+    def __str__(self):
+        return f'Автор: {self.author}, Подписчик: {self.user}'

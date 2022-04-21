@@ -40,7 +40,7 @@ class BaseUrlsTest(TestCase):
 
 
 class PostTestAccessAnonim(BaseUrlsTest):
-# Проверяем URLS для анонимного пользователя
+    """Проверяем URLS для анонимного пользователя."""
     def test_access_for_anonim(self):
         """Основные страницы доступны для анонимного пользователя."""
         for address in self.url_templates:
@@ -65,7 +65,7 @@ class PostTestAccessAnonim(BaseUrlsTest):
 
 
 class PostTestTemplatesAnonim(BaseUrlsTest):
-    # Проверяем Templates для анонимного пользователя
+    """Проверяем Templates для анонимного пользователя"""
     def test_used_correct_templates_for_anonim(self):
         """HTML-шаблон приходит в соответствиии с URL-адресом."""
         if self.url_templates in self.list_anonim:
@@ -76,7 +76,7 @@ class PostTestTemplatesAnonim(BaseUrlsTest):
 
 
 class PostTestAccessAuth(BaseUrlsTest):
-    # Проверяем доступность страниц для авторизованного пользователя
+    """Проверяем доступность страниц для авторизованного пользователя."""
     def test_available_for_auth_users(self):
         """Страницы для авторизованного пользователя доступны."""
         for address in self.url_templates:
@@ -91,7 +91,7 @@ class PostTestAccessAuth(BaseUrlsTest):
 
 
 class PostTestTemplatesAuth(BaseUrlsTest):
-    # Проверяем Templates для авторизованного пользователя
+    """Проверяем Templates для авторизованного пользователя."""
     def test_used_correct_template_for_auth_users(self):
         """HTML-шаблон приходит в соответствиии с URL-адресом."""
         if self.list_author not in self.url_templates:
@@ -105,7 +105,7 @@ class PostTestTemplatesAuth(BaseUrlsTest):
 
 
 class PostTestTemplatesAuthor(BaseUrlsTest):
-    # Проверяем доступность страницы редактирования поста
+    """Проверяем доступность страницы редактирования поста."""
     def setUp(self):
         super().setUp()
         self.other_user = User.objects.create_user(username='other_user')

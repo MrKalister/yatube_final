@@ -4,7 +4,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import CommentForm, PostForm
-from .models import Group, Post
+from .models import Follow, Group, Post
 
 User = get_user_model()
 
@@ -41,9 +41,15 @@ def profile(request, username):
     template = 'posts/profile.html'
     profile = get_object_or_404(User, username=username)
     post_list = profile.posts.all()
+    following = False
+    if request.user.is_authenticated:
+        follower_list = Follow.objects.filter(user=request.user, author=profile)
+        if follower_list:
+            following = True
     context = {
         'profile': profile,
-        'page_obj': call_paginator(post_list, request),
+        'following': following,
+        'page_obj': call_paginator(post_list, request)
     }
     return render(request, template, context)
 
@@ -121,3 +127,44 @@ def add_comment(request, post_id):
         return redirect('Posts:post_detail', post_id)
     form.save()
     return redirect('Posts:post_detail', post_id)
+
+
+@login_required
+def follow_index(request):
+    '''
+    Выводит посты авторов
+    на которых подписан текущий пользователь.
+    '''
+    post_list = Post.objects.filter(author__following__user=request.user)
+    context = {
+        'page_obj': call_paginator(post_list, request),
+        'title': 'Избранные авторы',
+    }
+    return render(request, 'posts/follow.html', context)
+
+
+@login_required
+def profile_follow(request, username):
+    '''Функция подписки на автора.'''
+    author = get_object_or_404(User, username=username)
+    follower = request.user
+    follower_list = Follow.objects.filter(author=author, user=follower)
+    if follower_list.exists() or follower == author:
+        return redirect('Posts:index')
+    Follow.objects.create(
+        author = author,
+        user = follower
+    )
+    return redirect('Posts:profile', username)
+
+
+@login_required
+def profile_unfollow(request, username):
+    '''Функция отписки от автора.'''
+    author = get_object_or_404(User, username=username)
+    follower = request.user
+    follower_list = Follow.objects.filter(author=author, user=follower)
+    if not follower_list.exists():
+        return redirect('Posts:index')
+    follower_list.delete()
+    return redirect('Posts:profile', username)

@@ -143,9 +143,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'Posts:index'
 # LOGOUT_REDIRECT_URL = 'Posts:index'
+
 # EMAIL_BACKEND = 'django.core.mail.backends.XXX'. Вместо XXX указывается название модуля
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-
 # что бы сообщения не отправлялись на почту, а приходили в папку sent_emails
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 

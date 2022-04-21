@@ -1,15 +1,15 @@
 import shutil
 import tempfile
-from urllib import response
 
-from django.core.cache import cache
 from django import forms
-from django.contrib.auth import get_user_model
-from ..models import Comment, Group, Post
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
+
+from ..models import Comment, Follow, Group, Post
 
 User = get_user_model()
 POST_IN_FIRST_PAGE = 10
@@ -67,9 +67,17 @@ class BaseViewsTest(TestCase):
             reverse('Posts:post_edit', kwargs={
                 'post_id': cls.post.pk
             }): 'posts/create_post.html',
+            reverse('Posts:follow_index'): 'posts/follow.html',
+            reverse('Posts:profile_follow', kwargs={
+                'username': cls.user
+            }): 'posts/follow.html',
+            reverse('Posts:profile_unfollow', kwargs={
+                'username': cls.user
+            }): 'posts/follow.html',
         }
         cls.keys_dict = list(cls.templates_pages_names.keys())
         cls.have_paginator = cls.keys_dict[:3]
+        cls.for_not_author = cls.keys_dict[-2:]
 
     @classmethod
     def tearDownClass(cls):
@@ -83,17 +91,24 @@ class BaseViewsTest(TestCase):
 
 
 class PostViewsTemplatesTest(BaseViewsTest):
-    # Тест на получение корректных HTML-шаблонов
+    """Тестирование HTML-шаблонов"""
+    def setUp(self):
+        super().setUp()
+        self.other_user = User.objects.create_user(username='other_user')
+        self.authorized_client_other = Client()
+        self.authorized_client_other.force_login(self.other_user)
+
     def test_pages_used_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
         for reverse_name, template in self.templates_pages_names.items():
             with self.subTest(reverse_name=reverse_name):
-                response = self.authorized_client.get(reverse_name)
-                self.assertTemplateUsed(response, template)
+                if reverse_name not in self.for_not_author:
+                    response = self.authorized_client.get(reverse_name)
+                    self.assertTemplateUsed(response, template)
 
 
 class PaginatorViewsTest(BaseViewsTest):
-    # Тест на корректное отображение паджинатора
+    """Тестирование паджинатора."""
     def setUp(self):
         super().setUp()
         for i in range(POST_IN_FIRST_PAGE + POST_IN_SECOND_PAGE):
@@ -107,10 +122,12 @@ class PaginatorViewsTest(BaseViewsTest):
         """Тест паджинатора:на первой странице 10 постов."""
         for first in self.have_paginator:
             response = self.guest_client.get(first)
+            response.context['page_obj']
             len_cont = len(response.context['page_obj'])
             self.assertEqual(len_cont, POST_IN_FIRST_PAGE)
 
     def test_paginator_second_page(self):
+        """Тест паджинатора:на второй странице 3 поста."""
         for second in self.have_paginator:
             created_post = Post.objects.count()
             response = self.guest_client.get(second + '?page=2')
@@ -119,7 +136,7 @@ class PaginatorViewsTest(BaseViewsTest):
 
 
 class PostViewsContextTest(BaseViewsTest):
-    # Тест на получение верного контекста в HTML-шаблон
+    """Тестирование контекста в HTML-шаблонах."""
     def test_correct_context_page_obj(self):
         """Тест контекста - page_obj функций index, group_list, profile """
         for obj in range(len(self.have_paginator)):
@@ -163,20 +180,22 @@ class PostViewsContextTest(BaseViewsTest):
         self.assertEqual(comment.text, self.comment.text)
 
     def test_post_create_correct_context_is_edit(self):
-        """Тест контекста - group функции group_posts."""
+        """Тест контекста - is_edit функции post_create."""
         response = self.authorized_client.get(self.keys_dict[4])
         is_edit = response.context['is_edit']
         self.assertFalse(is_edit)
 
     def test_post_edit_correct_context_is_edit(self):
-        """Тест контекста - group функции group_posts."""
+        """Тест контекста - is_edit функции post_edit."""
         response = self.authorized_client.get(self.keys_dict[5])
         is_edit = response.context['is_edit']
         self.assertTrue(is_edit)
 
-    # Тестирование форм.
+
+class PostViewsFieldsTest(BaseViewsTest):
+    """Тестирование полей формы в HTML-шаблонах."""
     def test_post_create_correct_context_form_get(self):
-        """Шаблон post_create сформирован с правильным контекстом."""
+        """Шаблон post_create сформирован с правильной формой."""
         response = self.authorized_client.get(self.keys_dict[4])
         form_fields = {
             'text': forms.fields.CharField,
@@ -189,7 +208,7 @@ class PostViewsContextTest(BaseViewsTest):
                 self.assertIsInstance(form_field, expected)
 
     def test_post_edit_correct_context_form_get(self):
-        """Шаблон post_edit сформирован с правильным контекстом."""
+        """Шаблон post_edit сформирован с правильной формой."""
         response = self.authorized_client.get(self.keys_dict[5])
         form_fields = {
             'text': forms.fields.CharField,
@@ -214,3 +233,51 @@ class PostViewsCacheTest(BaseViewsTest):
             self.authorized_client.get(self.keys_dict[0])
         ).content
         self.assertNotEqual(response, response_clear)
+
+
+class PostViewsFollowTest(BaseViewsTest):
+    """Тестирование возможности подписки и отписки от авторов."""
+    def setUp(self):
+        super().setUp()
+        self.other_user = User.objects.create_user(username='other_user')
+        self.authorized_client_other = Client()
+        self.authorized_client_other.force_login(self.other_user)
+
+    def test_auth_able_follow(self):
+        """Авторизованный пользователь может подписываться на пользователей."""
+        cnt_follower = Follow.objects.count()
+        redirect_url = self.keys_dict[2]
+        response = self.authorized_client_other.get(self.keys_dict[7])
+        self.assertRedirects(response, redirect_url)
+        self.assertEqual(Follow.objects.count(), cnt_follower + 1)
+        self.assertTrue(
+            Follow.objects.filter(author__username='test_user').exists()
+        )
+
+    def test_auth_able_unfollow(self):
+        """Авторизованный пользователь может удалять авторов из подписок."""
+        cnt_follower = Follow.objects.count()
+        redirect_url = self.keys_dict[2]
+        response = self.authorized_client_other.get(self.keys_dict[7])
+        self.assertNotEqual(Follow.objects.count(), cnt_follower)
+        response = self.authorized_client_other.get(self.keys_dict[8])
+        self.assertRedirects(response, redirect_url)
+        self.assertEqual(Follow.objects.count(), cnt_follower)
+        self.assertFalse(
+            Follow.objects.filter(author__username='test_user').exists()
+        )
+
+    def test_do_not_show_posts_to_not_followers(self):
+        """Новая запись автора не появляется в ленте тех, кто не подписан."""
+        response = self.authorized_client_other.get(self.keys_dict[6])
+        response.context['page_obj']
+        len_cont = len(response.context['page_obj'])
+        self.assertEqual(len_cont, Follow.objects.count())
+
+    def test_show_posts_to_followers(self):
+        """Новая запись автора появляется в ленте тех, кто на него подписан."""
+        self.authorized_client_other.get(self.keys_dict[7])
+        response = self.authorized_client_other.get(self.keys_dict[6])
+        response.context['page_obj']
+        len_cont = len(response.context['page_obj'])
+        self.assertEqual(len_cont, Follow.objects.count())
