@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .forms import CommentForm, PostForm
 from .models import Follow, Group, Post
 
+
 User = get_user_model()
 
 
@@ -42,13 +43,11 @@ def profile(request, username):
     profile = get_object_or_404(User, username=username)
     post_list = profile.posts.all()
     following = False
-    if request.user.is_authenticated:
-        follower_list = Follow.objects.filter(
-            user=request.user,
-            author=profile
-        )
-        if follower_list:
-            following = True
+    if request.user.is_authenticated and Follow.objects.filter(
+        user=request.user,
+        author=profile
+    ).exists():
+        following = True
     context = {
         'profile': profile,
         'following': following,
@@ -128,7 +127,6 @@ def add_comment(request, post_id):
         comment.post = post
         comment.save()
         return redirect('Posts:post_detail', post_id)
-    form.save()
     return redirect('Posts:post_detail', post_id)
 
 

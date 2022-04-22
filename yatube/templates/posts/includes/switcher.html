@@ -1,22 +1,24 @@
 {% if user.is_authenticated %}
   <div class="row my-3">
     <ul class="nav nav-tabs">
-      <li class="nav-item">
-        <a 
-          class="nav-link {% if index %}active{% endif %}"
-          href="{% url 'Posts:index' %}"
-        >
-          Все авторы
-        </a>
-      </li>
-      <li class="nav-item">
-        <a 
-           class="nav-link {% if follow %}active{% endif %}"
-           href="{% url 'Posts:follow_index' %}"
-        >
-          Избранные авторы
-        </a>
-      </li>
+      {% with request.resolver_match.view_name as view_name %}
+        <li class="nav-item">
+          <a 
+            class="nav-link {% if view_name == 'Posts:index' %}active{% endif %}"
+            href="{% url 'Posts:index' %}"
+          >
+            Все авторы
+          </a>
+        </li>
+        <li class="nav-item">
+          <a 
+            class="nav-link {% if view_name == 'Posts:follow_index' %}active{% endif %}"
+            href="{% url 'Posts:follow_index' %}"
+          >
+            Избранные авторы
+          </a>
+        </li>
+      {% endwith %}
     </ul>
   </div>
 {% endif %}

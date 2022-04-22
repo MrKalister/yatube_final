@@ -266,3 +266,5 @@ class CommentFormTestCreateAuth(BaseFormsTest):
         self.assertTrue(Comment.objects.filter(
             text=comment_data['text']
         ).exists())
+        self.assertTrue(Comment.objects.filter(author=self.user))
+        self.assertTrue(Comment.objects.filter(post=self.post))
