@@ -153,6 +153,7 @@ yatube/media/
 
 # MytestDir
 MYtestdir/
+My_test/
 
 # файлы и папки, создаваемые пакетом Coverage
 htmlcov/
