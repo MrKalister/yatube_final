@@ -1,10 +1,10 @@
-# yatube_project
-### Описание
+# Yatube
+### Description
 Social network of free writers
-### Технологии
+### Technology
 Python 3.9.10
 Django 2.2.19
-### Запуск проекта в dev-режиме
+### Run a project in dev-mode
 - Install and activate the virtual environment
 - Install dependencies from the file requirements.txt
 ```
@@ -16,8 +16,8 @@ python3 manage.py runserver
 ```
 ---
 
-### Авторы
- **Maxim Novikov Aka Mr.Kalister** 
+### Author
+ **Maxim Novikov** 
 ## Date of creation
 
 2022/3/1
