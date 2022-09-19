@@ -41,7 +41,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-# IP адреса, при которых будет доступен django-debug-toolbar
+
+# ip addresses for DebugToolbarMiddleware
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
@@ -72,6 +73,8 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -86,15 +89,17 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-# Локационные настройки
+
+# Internationalization
 LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-# Директория для хранения статики
+# Folder for static files
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # Директория для хранения медиа
 MEDIA_URL = '/media/'
@@ -104,10 +109,11 @@ LOGIN_REDIRECT_URL = 'Posts:index'
 # EMAIL_BACKEND = 'django.core.mail.backends.XXX'.
 # Вместо XXX указывается название модуля
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-# Директория для сохрания сообщений
+# So that messages are not sent to the mail, but come to the folder 'sent_emails'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
-# для кэширования страниц
+
+# Page cache
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
