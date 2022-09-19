@@ -9,7 +9,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv('SECRET_KEY', 'the-best-secret-key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-# Запрос к проекту через Client()
+# Request to the project using Client()
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
@@ -47,7 +47,7 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 ROOT_URLCONF = 'yatube.urls'
-# Директория для хранения шаблонов
+# Directory for storing templates
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 TEMPLATES = [
     {
@@ -101,7 +101,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 # Folder for static files
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-# Директория для хранения медиа
+# Media storage directory
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_URL = 'users:login'
