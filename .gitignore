@@ -150,6 +150,8 @@ static/
 yatube/posts/static/
 yatube/media/
 
+# дамп БД
+dump.json
 
 # MytestDir
 MYtestdir/
