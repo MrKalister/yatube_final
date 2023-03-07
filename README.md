@@ -52,5 +52,3 @@ python3 manage.py runserver
 
 ### Author
  **Maxim Novikov** 
-## Date of creation
-2022/3/1
